@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="{{url_for('static', filename = '/adminPanel.css')}}">
+<title>Admin HomePage</title>
+{% endblock %}
+
+{% block body %}
+<!-- Navbar -->
+
+<h1 onclick="takeHome();">Hey! Admin</h1>
+<div id="buttons">
+    <h3>Select your action</h3>
+
+    <button type="button" class="btn btn-primary btn-lg btn-block addButton" onclick="triggerAdd()">Add an
+        Item</button>
+    <button type="button" class="btn btn-danger btn-lg btn-block removeButton" onclick="triggerRemove()">Remove an
+        Item</button>
+</div>
+
+
+<div id="addItem">
+    <h3>Fill in the details and press "Add to Database":</h3><br />
+
+    <form action="/admin" method="POST">
+        <label for="productName">Product Name: </label>
+        <input type="text" name="productName" id="productName" /><br /><br />
+
+        <label for="productDescription">Product Description: </label>
+        <input type="text" name="productDescription" id="productDescription" /><br /><br />
+
+        <!-- <label for="myfile">Select a Thumbnail:</label>
+        <input type="file" id="myfile" name="myfile" /><br /><br /> -->
+
+        <label for="myfile">Insert Thumbnail Link:</label>
+        <input type="text" id="thumbnailLink" name="thumbnailLink" /><br /><br />
+
+        <label for="productPrice">Product Price: </label>
+        <input type="text" name="productPrice" id="productPrice" /><br /><br />
+
+        <label for="productLink">Product Download Link: </label>
+        <input type="text" name="productLink" id="productLink" /><br /><br />
+
+        <button class="btn btn-primary">Add to database</button>
+    </form>
+</div>
+
+
+<div id="deleteItem">
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Thumbnail Link</th>
+                <th>Download Link</th>
+                <th>Actions</th>
+            </tr>
+            {% for product in products %}
+            <tr>
+                <td>{{product.name}}</td>
+                <td>{{product.description}}</td>
+                <td>{{product.price}}</td>
+                <td>{{product.thumbnailLink}}</td>
+                <td>{{product.link}}</td>
+                <td><a href="/delete/{{product.id}}">Delete</a></td>
+            </tr>
+            {%endfor%}
+        </table>
+</div>
+
+
+<!-- Footer -->
+<script>
+    function takeHome() {
+        document.getElementById("buttons").style.display = 'block';
+        document.getElementById("deleteItem").style.display = 'none'
+        document.getElementById("addItem").style.display = 'none'
+    }
+    function triggerRemove() {
+        document.getElementById("buttons").style.display = 'none';
+        document.getElementById("deleteItem").style.display = 'block'
+        document.getElementById("addItem").style.display = 'none'
+    }
+    function triggerAdd() {
+        document.getElementById("buttons").style.display = 'none';
+        document.getElementById("deleteItem").style.display = 'none'
+        document.getElementById("addItem").style.display = 'block'
+    }
+</script>
+{% endblock %}
