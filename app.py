@@ -11,7 +11,7 @@ from flask_bcrypt import Bcrypt
 from datetime import datetime
 import base64
 
-
+loggedInAs = None
 SECRET_KEY = os.urandom(32)
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
@@ -43,7 +43,15 @@ class ProductsInfo(db.Model):
     def __repr__(self):
         return f'<Task : {self.id}>'
 
+# -----------------------------> Table to store the details of all the products brought
+class ProductBrought(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    userid = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
+    productid = db.Column(db.Integer, db.ForeignKey('products_info.id'), nullable = False)
+    date = db.Column(db.DateTime, default=datetime.utcnow)
 
+
+# -----------------------> Table containing details of users
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
@@ -84,8 +92,10 @@ class RegsiterForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    email = StringField(validators=[InputRequired(), Length(
-        min=4, max=20)], render_kw={"placeholder": "Email"})
+
+    username = StringField(validators=[InputRequired(), Length(
+        min=4, max=20)], render_kw={"placeholder": "Username"})
+    
     password = PasswordField(validators=[InputRequired(), Length(
         min=4, max=20)], render_kw={"placeholder": "Password"})
     submit = SubmitField("Login")
@@ -95,7 +105,6 @@ class LoginForm(FlaskForm):
 
 @app.route('/admin', methods=['GET', 'POST'])
 def adminHome():
-
     # --------------> For admin to add new product
     if request.method == 'POST':
 
@@ -136,34 +145,47 @@ def deleteProduct(id):
     except:
         return "Some error occured while deleting the file"
 
-
+# -------------------------> For Homepage
 @app.route('/')
 def home():
     return render_template('home.html')
 
-
+# -----------------------------> For logging in admin and normal users
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    if form.validate_on_submit():
-        email = User.query.filter_by(email=form.email.data).first()
-        if email:
-            if bcrypt.check_password_hash(email.password, form.password.data):
-                login_user(email)
-                return redirect(url_for('dashboard'))
-    return render_template('login.html', form=form)
+
+    # For admin
+    if form.username.data and form.username.data == 'admin':
+        if form.password.data =='admin':
+            loggedInAs = 'admin'
+            return redirect('/admin')
+        else:
+            return redirect('/login')
+    
+    # For normal user
+    else:
+        if form.validate_on_submit():
+            username = User.query.filter_by(username=form.username.data).first()
+            if username:
+                if bcrypt.check_password_hash(username.password, form.password.data):
+                    loggedInAs = username
+                    login_user(username)
+                    return redirect('/')
+        return render_template('login.html', form=form)
 
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     logout_user()
+    loggedInAs = None
     return redirect(url_for('login'))
 
 
-@app.route('/dashboard', methods=['GET', 'POST'])
-@login_required
-def dashboard():
-    return render_template('dashboard.html')
+# @app.route('/dashboard', methods=['GET', 'POST'])
+# @login_required
+# def dashboard():
+#     return render_template('dashboard.html')
 
 
 @app.route('/signup', methods=['GET', 'POST'])
