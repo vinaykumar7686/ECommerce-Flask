@@ -1,0 +1,8 @@
+os
+flask
+flask_sqlalchemy
+flask_login
+flask_wtfwtforms
+flask_bcrypt
+datetime
+base64
