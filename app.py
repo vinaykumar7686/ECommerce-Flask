@@ -1,5 +1,5 @@
 import os
-from flask import Flask, url_for, redirect, request
+from flask import Flask, url_for, redirect, request, flash
 from flask.templating import render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_manager, login_user, login_required, LoginManager, current_user, logout_user
@@ -44,10 +44,13 @@ class ProductsInfo(db.Model):
         return f'<Task : {self.id}>'
 
 # -----------------------------> Table to store the details of all the products brought
+
+
 class ProductBrought(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    userid = db.Column(db.Integer, db.ForeignKey('user.id'), nullable = False)
-    productid = db.Column(db.Integer, db.ForeignKey('products_info.id'), nullable = False)
+    userid = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    productid = db.Column(db.Integer, db.ForeignKey(
+        'products_info.id'), nullable=False)
     date = db.Column(db.DateTime, default=datetime.utcnow)
 
 
@@ -92,10 +95,8 @@ class RegsiterForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-
     username = StringField(validators=[InputRequired(), Length(
         min=4, max=20)], render_kw={"placeholder": "Username"})
-    
     password = PasswordField(validators=[InputRequired(), Length(
         min=4, max=20)], render_kw={"placeholder": "Password"})
     submit = SubmitField("Login")
@@ -105,6 +106,7 @@ class LoginForm(FlaskForm):
 
 @app.route('/admin', methods=['GET', 'POST'])
 def adminHome():
+
     # --------------> For admin to add new product
     if request.method == 'POST':
 
@@ -146,9 +148,12 @@ def deleteProduct(id):
         return "Some error occured while deleting the file"
 
 # -------------------------> For Homepage
+
+
 @app.route('/')
 def home():
     return render_template('home.html')
+
 
 # -----------------------------> For logging in admin and normal users
 @app.route('/login', methods=['GET', 'POST'])
@@ -157,21 +162,29 @@ def login():
 
     # For admin
     if form.username.data and form.username.data == 'admin':
-        if form.password.data =='admin':
+        if form.password.data == 'admin':
             loggedInAs = 'admin'
             return redirect('/admin')
         else:
+            flash(f'Your credentials did not match. Please try again')
             return redirect('/login')
-    
+
     # For normal user
     else:
         if form.validate_on_submit():
-            username = User.query.filter_by(username=form.username.data).first()
+            username = User.query.filter_by(
+                username=form.username.data).first()
             if username:
                 if bcrypt.check_password_hash(username.password, form.password.data):
                     loggedInAs = username
                     login_user(username)
                     return redirect('/')
+                else:
+                    flash(f'Your credentials did not match. Please try again')
+                    return redirect(url_for('login'))
+            else:
+                flash(f'Your credentials did not match. Please try again')
+                return redirect(url_for('login'))
         return render_template('login.html', form=form)
 
 
@@ -180,7 +193,6 @@ def logout():
     logout_user()
     loggedInAs = None
     return redirect(url_for('login'))
-
 
 # @app.route('/dashboard', methods=['GET', 'POST'])
 # @login_required
@@ -197,8 +209,19 @@ def signup():
                         email=form.email.data, mobile=form.mobile.data)
         db.session.add(new_user)
         db.session.commit()
+        flash(f"You have signed up successfully. Redirecting you to login page.")
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
+
+
+@app.route('/order')
+def order():
+    return render_template('order.html')
+
+
+@app.route('/orderStatus')
+def orderStatus():
+    return render_template('orderPlaced.html')
 
 
 if __name__ == '__main__':

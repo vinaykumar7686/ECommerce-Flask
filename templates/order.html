@@ -1,0 +1,74 @@
+{% extends "heading.html" %} {% block content %}
+<link rel="icon" property="icon" href="https://cdn-icons-png.flaticon.com/512/282/282100.png" type="image/x-icon" />
+<link rel="stylesheet" property="stylesheet"
+  href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" />
+<div class="container">
+  <div class="row">
+    <div class="col-lg-3 my-4">
+      <div class="list-group">
+        <a href="" class="list-group-item">T-Shirt</a>
+        <a href="" class="list-group-item">Wallet</a>
+        <a href="" class="list-group-item">Belt</a>
+        <a href="" class="list-group-item">Shoes</a>
+      </div>
+    </div>
+
+    <div class="col-lg-9">
+      <div class="row">
+        <div class="col-lg-6">
+          <div class="card mt-4">
+            <img class="card-img-top img-fluid"
+              src="https://img.sonofatailor.com/images/customizer/product/White_O_Crew_Regular_NoPocket.jpg" alt=""
+              style="
+                width: 300px;
+                height: 390px;
+                margin-left: auto;
+                margin-right: auto;
+              " />
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="card card-outline-secondary my-4">
+            <div class="card-header">Order Details</div>
+
+            <div class="card-body">
+              <form>
+                <div class="form-group">
+                  <dt><label for="name"></label></dt>
+                  <input class="form-control" id="name" name="name" placeholder="Full Name" type="text" />
+                </div>
+
+                <div class="form-group">
+                  <dt><label for="mobile_num"></label></dt>
+                  <input class="form-control" id="mobile_num" name="mobile_num" placeholder="Mobile" type="text" />
+                </div>
+
+                <div class="form-group">
+                  <dt><label for="quantity"></label></dt>
+                  <select class="form-control" id="quantity" name="quantity">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <dt><label for="order_place"></label></dt>
+                  <input class="form-control" id="order_place" name="order_place" placeholder="Order Place" required=""
+                    type="text" value="" />
+                </div>
+                <a href="{{ url_for('orderStatus')}}"><button type="button" class="btn btn-primary">
+                    Confirm Order
+                  </button></a>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
