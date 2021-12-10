@@ -1,5 +1,5 @@
 import os
-from flask import Flask, url_for, redirect, request, flash
+from flask import Flask, url_for, redirect, request, flash, session
 from flask.templating import render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_manager, login_user, login_required, LoginManager, current_user, logout_user
@@ -11,7 +11,6 @@ from flask_bcrypt import Bcrypt
 from datetime import datetime
 import base64
 
-loggedInAs = None
 SECRET_KEY = os.urandom(32)
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
@@ -106,21 +105,14 @@ class LoginForm(FlaskForm):
 
 @app.route('/admin', methods=['GET', 'POST'])
 def adminHome():
-
     # --------------> For admin to add new product
     if request.method == 'POST':
-
-        # thumbnail = request.files['myfile']
-        # data = thumbnail.read()
-        # render_file = render_picture(data)
-
         newItem = ProductsInfo(
-            name=request.form['productName'],
-            description=request.form['productDescription'],
-            price=request.form['productPrice'],
-            link=request.form['productLink'],
-            thumbnailLink=request.form['thumbnailLink']
-            # thumbnail = render_file
+        name=request.form['productName'],
+        description=request.form['productDescription'],
+        price=request.form['productPrice'],
+        link=request.form['productLink'],
+        thumbnailLink=request.form['thumbnailLink']
         )
         try:
             db.session.add(newItem)
@@ -152,13 +144,7 @@ def deleteProduct(id):
 
 @app.route('/')
 def home():
-    allProducts = []
-    try:
-        allProducts = ProductsInfo.query.all()
-        print("======-=-=-=-==-=======>",allProducts)
-    except:
-        pass
-    return render_template('home.html', allProducts = allProducts)
+    return render_template('home.html')
 
 
 # -----------------------------> For logging in admin and normal users
@@ -169,10 +155,11 @@ def login():
     # For admin
     if form.username.data and form.username.data == 'admin':
         if form.password.data == 'admin':
-            loggedInAs = 'admin'
+            session['username'] = request.form['username']
+            session['logged_in'] = True
             return redirect('/admin')
         else:
-            flash(f'Your credentials did not match. Please try again')
+            flash(f'Your credentials did not match. Please try again', 'danger')
             return redirect('/login')
 
     # For normal user
@@ -182,14 +169,15 @@ def login():
                 username=form.username.data).first()
             if username:
                 if bcrypt.check_password_hash(username.password, form.password.data):
-                    loggedInAs = username
+                    session['username'] = request.form['username']
+                    session['logged_in'] = True
                     login_user(username)
                     return redirect('/')
                 else:
-                    flash(f'Your credentials did not match. Please try again')
+                    flash(f'Your credentials did not match. Please try again', 'danger')
                     return redirect(url_for('login'))
             else:
-                flash(f'Your credentials did not match. Please try again')
+                flash(f'Your credentials did not match. Please try again', 'danger')
                 return redirect(url_for('login'))
         return render_template('login.html', form=form)
 
@@ -197,7 +185,7 @@ def login():
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     logout_user()
-    loggedInAs = None
+    session['logged_in'] = False
     return redirect(url_for('login'))
 
 # @app.route('/dashboard', methods=['GET', 'POST'])
@@ -210,26 +198,24 @@ def logout():
 def signup():
     form = RegsiterForm()
     if form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(form.password.data, 12)
-        new_user = User(username=form.username.data, password=hashed_password,
-                        email=form.email.data, mobile=form.mobile.data)
-        db.session.add(new_user)
-        db.session.commit()
-        flash(f"You have signed up successfully. Redirecting you to login page.")
-        return redirect(url_for('login'))
+        if (form.username.data).lower() == 'admin':
+            flash(f'Username not allowed. Please any other username.', 'danger')
+            return redirect(url_for('signup'))
+        else:
+            hashed_password = bcrypt.generate_password_hash(
+                form.password.data, 12)
+            new_user = User(username=form.username.data, password=hashed_password,
+                            email=form.email.data, mobile=form.mobile.data)
+            db.session.add(new_user)
+            db.session.commit()
+            flash(f'You have signed up successfully. Please login now.', 'success')
+            return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
 
-@app.route('/order/<int:productid>')
-def order(productid):
-    try:
-        productDetails = ProductsInfo.query.get_or_404(productid)
-        return render_template('order.html', productDetails = productDetails)
-    except:
-        #!!! Product not found Warning must show up
-        return redirect('/')
-    
-    
+@app.route('/order')
+def order():
+    return render_template('order.html')
 
 
 @app.route('/orderStatus')
