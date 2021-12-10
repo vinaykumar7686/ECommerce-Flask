@@ -1,7 +1,62 @@
 {% extends "heading.html" %}
 {% block title %}
 <title>Home</title>
+<style>
+  /*Featured Section*/
+  #featured_resource {
+    margin-top: 125px;
+    margin-bottom: 50px;
+  }
+
+  .resource {
+    margin-top: 40px;
+    margin-left: 60px;
+    margin-right: -20px;
+    width: 20%;
+    display: inline-block;
+    text-align: center;
+    border-radius: 20px;
+    background-color: rgb(245, 245, 245);
+    box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+    border-color: transparent;
+    min-width: 250px;
+  }
+
+  .resource_img {
+    width: 100%;
+    border-radius: 20px;
+  }
+
+  .cust_size {
+    margin: 0px;
+    margin-bottom: 20px;
+    width: 100px;
+    height: 30px;
+  }
+
+  .cust_color {
+    background-color: gray;
+    margin-right: 15px;
+  }
+
+  .add_padding {
+    padding-left: 9px;
+    padding-right: 9px;
+  }
+
+  .custom_button {
+    background-color: rgba(25, 154, 132, 255);
+    width: 150px;
+    height: 45px;
+    font-size: 15px;
+    color: white;
+    border-radius: 13px;
+    vertical-align: middle;
+    border-color: transparent;
+  }
+</style>
 {% endblock %}
+
 {% block content %}
 <div class="slideshow-container">
   <div class="mySlides fade">
@@ -45,73 +100,17 @@
   }
 </script>
 
-<section class="resource">
-  <img src="./static/Images/Image 1.png" alt="" class="resource_img">
-  <h3 class="add_padding"><img src="survive.jpg" width="130px" height="200 px"></h3>
-  <h4>Survive the Night</h4>
-  <h4>INR 300</h4>
-  {% include "buy_now.html" %}
+{% for product in allProducts %}
 
-</section>
 <section class="resource">
-  <img src="./static/Images/Image 1.png" alt="" class="resource_img">
-  <h3 class="add_padding"><img src="humo.jpg" width="130px" height="200 px">
-    <h4>Survive the Night</h4>
-    <h4>INR 300</h4>
-    {% include "buy_now.html" %}
+  <img src={{product.thumbnailLink}} alt="" class="resource_img">
+  <h3 class="add_padding">{{product.name}}</h3>
+  <p class="add_padding">{{product.description}}</p>
+  <h4>{{product.price}}</h4>
+  <a href="/order/{{product.id}}"><button type="button" class="custom_button cust_size">Buy Now</button></a>
+</section>
 
-</section>
-<section class="resource">
-  <img src="./static/Images/Image 1.png" alt="" class="resource_img">
-  <h3 class="add_padding"><img src="fly.jpg" width="130px" height="200 px">
-    <h4>Survive the Night</h4>
-    <h4>INR 300</h4>
-    {% include "buy_now.html" %}
+{% endfor %}
 
-</section>
-<section class="resource">
-  <img src="./static/Images/Image 1.png" alt="" class="resource_img">
-  <h3 class="add_padding"><img src="marry.png" width="130px" height="200 px">
-    <h4>Survive the Night</h4>
-    <h4>INR 300</h4>
-    {% include "buy_now.html" %}
-
-</section>
-</section>
-<section class="resource">
-  <img src="./static/Images/Image 1.png" alt="" class="resource_img">
-  <h3 class="add_padding"><img src="folly.png" width="130px" height="200 px">
-    <h4>Survive the Night</h4>
-    <h4>INR 300</h4>
-    {% include "buy_now.html" %}
-
-</section>
-</section>
-<section class="resource">
-  <img src="./static/Images/f[[ly.jpg" alt="" class="resource_img">
-  <h3 class="add_padding"><img src="lawless.png" width="130px" height="200 px">
-    <h4>Survive the Night</h4>
-    <h4>INR 300</h4>
-    {% include "buy_now.html" %}
-
-</section>
-</section>
-<section class="resource">
-  <img src="./static/Images/Image 1.png" alt="" class="resource_img">
-  <h3 class="add_padding"><img src="humo.jpg" width="130px" height="200 px">
-    <h4>Survive the Night</h4>
-    <h4>INR 300</h4>
-    {% include "buy_now.html" %}
-
-</section>
-</section>
-<section class="resource">
-  <img src="./static/Images/Image 1.png" alt="" class="resource_img">
-  <h3 class="add_padding"><img src="fly.jpg" width="130px" height="200 px">
-    <h4>Survive the Night</h4>
-    <h4>INR 300</h4>
-    {% include "buy_now.html" %}
-</section>
-</section>
 </section>
 {% endblock %}

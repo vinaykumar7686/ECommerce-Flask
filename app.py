@@ -152,7 +152,13 @@ def deleteProduct(id):
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    allProducts = []
+    try:
+        allProducts = ProductsInfo.query.all()
+        print("======-=-=-=-==-=======>",allProducts)
+    except:
+        pass
+    return render_template('home.html', allProducts = allProducts)
 
 
 # -----------------------------> For logging in admin and normal users
@@ -214,9 +220,16 @@ def signup():
     return render_template('register.html', form=form)
 
 
-@app.route('/order')
-def order():
-    return render_template('order.html')
+@app.route('/order/<int:productid>')
+def order(productid):
+    try:
+        productDetails = ProductsInfo.query.get_or_404(productid)
+        return render_template('order.html', productDetails = productDetails)
+    except:
+        #!!! Product not found Warning must show up
+        return redirect('/')
+    
+    
 
 
 @app.route('/orderStatus')
