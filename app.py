@@ -153,6 +153,45 @@ def deleteProduct(id):
     else:
         return render_template('Error.html', title = "Access Denied!", msg = "You need admin priviledges to perform this action!")
 
+# ---------------------------> For admin to update a product
+@app.route('/update/<int:id>', methods=['GET', 'POST'])
+def updateProduct(id):
+    if request.method == 'GET':
+        if 'username' in session and session['username'] == 'admin':
+            print(id)
+            toUpdate = ProductsInfo.query.get_or_404(id)
+            return render_template('Admin/update.html', toUpdate = toUpdate)
+        else:
+            return render_template('Error.html', title = "Access Denied!", msg = "You need admin priviledges to perform this action!")
+
+    else:
+        if 'username' in session and session['username'] == 'admin':
+            print(id)
+
+            # name=request.form['productName'],
+            # author=request.form['productAuthor'],
+            # description=request.form['productDescription'],
+            # price=request.form['productPrice'],
+            # link=request.form['productLink'],
+            # thumbnailLink=request.form['thumbnailLink']
+
+            # updateProduct = ProductsInfo.query.filter_by(id).update(dict(name = name, author = author, description = description, price = price, link = link, thumbnailLink = thumbnailLink))
+            # db.session.commit()
+
+            # product = ProductsInfo.query.get(id)
+            # product.name=request.form['productName'],
+            # product.author=request.form['productAuthor'],
+            # product.description=request.form['productDescription'],
+            # product.price=request.form['productPrice'],
+            # product.link=request.form['productLink'],
+            # product.thumbnailLink=request.form['thumbnailLink']
+            # db.session.commit()
+
+
+            return redirect('/admin')
+
+
+
 # -------------------------> For Homepage
 
 

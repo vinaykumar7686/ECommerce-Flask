@@ -60,7 +60,9 @@
             <td>{{product.price}}</td>
             <td>{{product.thumbnailLink}}</td>
             <td>{{product.link}}</td>
-            <td><a href="/delete/{{product.id}}">Delete</a></td>
+            <td><a href="/update/{{product.id}}">Update</a><br/>
+                <a href="/delete/{{product.id}}">Delete</a>
+            </td>
         </tr>
         {%endfor%}
     </table>
