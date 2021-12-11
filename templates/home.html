@@ -60,7 +60,7 @@
 {% block content %}
 <div class="slideshow-container">
   <div class="mySlides fade">
-    <img src="fl32y.jpg" style="width:100%">
+    <img src=" style="width:100%">
   </div>
 
   <div class="mySlides fade">
@@ -104,13 +104,11 @@
 
 <section class="resource">
   <img src={{product.thumbnailLink}} alt="" class="resource_img">
-  <h3 class="add_padding">{{product.name}}</h3>
+  <h3 class="add_padding my-2">{{product.name}}</h3>
   <p class="add_padding">{{product.description}}</p>
   <h4>{{product.price}}</h4>
   <a href="/order/{{product.id}}"><button type="button" class="custom_button cust_size">Buy Now</button></a>
 </section>
-
 {% endfor %}
-
 </section>
 {% endblock %}

@@ -6,18 +6,14 @@
 {% endblock %}
 
 {% block body %}
-<!-- Navbar -->
-
 <h1 onclick="takeHome();">Hey! Admin</h1>
 <div id="buttons">
     <h3>Select your action</h3>
-
     <button type="button" class="btn btn-primary btn-lg btn-block addButton" onclick="triggerAdd()">Add an
         Item</button>
     <button type="button" class="btn btn-danger btn-lg btn-block removeButton" onclick="triggerRemove()">Remove an
         Item</button>
 </div>
-
 
 <div id="addItem">
     <h3>Fill in the details and press "Add to Database":</h3><br />
@@ -25,6 +21,9 @@
     <form action="/admin" method="POST">
         <label for="productName">Product Name: </label>
         <input type="text" name="productName" id="productName" /><br /><br />
+
+        <label for="productAuthor">Product Author: </label>
+        <input type="text" name="productAuthor" id="productAuthor" /><br /><br />
 
         <label for="productDescription">Product Description: </label>
         <input type="text" name="productDescription" id="productDescription" /><br /><br />
@@ -44,33 +43,28 @@
         <button class="btn btn-primary">Add to database</button>
     </form>
 </div>
-
-
 <div id="deleteItem">
-        <table>
-            <tr>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Price</th>
-                <th>Thumbnail Link</th>
-                <th>Download Link</th>
-                <th>Actions</th>
-            </tr>
-            {% for product in products %}
-            <tr>
-                <td>{{product.name}}</td>
-                <td>{{product.description}}</td>
-                <td>{{product.price}}</td>
-                <td>{{product.thumbnailLink}}</td>
-                <td>{{product.link}}</td>
-                <td><a href="/delete/{{product.id}}">Delete</a></td>
-            </tr>
-            {%endfor%}
-        </table>
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Price</th>
+            <th>Thumbnail Link</th>
+            <th>Download Link</th>
+            <th>Actions</th>
+        </tr>
+        {% for product in products %}
+        <tr>
+            <td>{{product.name}}</td>
+            <td>{{product.description}}</td>
+            <td>{{product.price}}</td>
+            <td>{{product.thumbnailLink}}</td>
+            <td>{{product.link}}</td>
+            <td><a href="/delete/{{product.id}}">Delete</a></td>
+        </tr>
+        {%endfor%}
+    </table>
 </div>
-
-
-<!-- Footer -->
 <script>
     function takeHome() {
         document.getElementById("buttons").style.display = 'block';
