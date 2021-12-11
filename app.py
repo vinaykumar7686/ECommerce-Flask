@@ -11,7 +11,6 @@ from flask_bcrypt import Bcrypt
 from datetime import datetime
 import base64
 
-
 SECRET_KEY = os.urandom(32)
 app = Flask(__name__)
 bcrypt = Bcrypt(app)
@@ -20,18 +19,20 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SECRET_KEY'] = SECRET_KEY
 
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = "login"
+# login_manager = LoginManager()
+# login_manager.init_app(app)
+# login_manager.login_view = "login"
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+
+# @login_manager.user_loader
+# def load_user(user_id):
+#     return User.query.get(int(user_id))
+
+
+
 
 # ----------------------------------------------------------------------------------
 # --------------------------------> Table to store products
-
-
 class ProductsInfo(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
@@ -110,41 +111,47 @@ class LoginForm(FlaskForm):
 
 @app.route('/admin', methods=['GET', 'POST'])
 def adminHome():
-    # --------------> For admin to add new product
-    if request.method == 'POST':
-        newItem = ProductsInfo(
-            name=request.form['productName'],
-            author=request.form['productAuthor'],
-            description=request.form['productDescription'],
-            price=request.form['productPrice'],
-            link=request.form['productLink'],
-            thumbnailLink=request.form['thumbnailLink']
-        )
-        try:
-            session['productName'] = request.form['productName']
-            db.session.add(newItem)
-            db.session.commit()
-            return redirect('/admin')
-        except:
-            return "There was an issue pushing to database"
+    if 'username' in session and session['username'] == 'admin':
+        # --------------> For admin to add new product
+        if request.method == 'POST':
+            newItem = ProductsInfo(
+                name=request.form['productName'],
+                author=request.form['productAuthor'],
+                description=request.form['productDescription'],
+                price=request.form['productPrice'],
+                link=request.form['productLink'],
+                thumbnailLink=request.form['thumbnailLink']
+            )
+            try:
+                session['productName'] = request.form['productName']
+                db.session.add(newItem)
+                db.session.commit()
+                return redirect('/admin')
+            except:
+                return "There was an issue pushing to database"
 
-    # --------------------> For admin to display all the stored products
+        # --------------------> For admin to display all the stored products
+        else:
+            products = ProductsInfo.query.order_by(ProductsInfo.name).all()
+            return render_template('Admin/adminPanel.html', products=products)
     else:
-        products = ProductsInfo.query.order_by(ProductsInfo.name).all()
-        return render_template('Admin/adminPanel.html', products=products)
-
+        return render_template('Error.html', title = 'Access Denied', msg = "Unable to access admin Homepage, Please signin to continue.")
+    
 
 # -----------------------> For admin to delete a product
 @app.route('/delete/<int:id>')
 def deleteProduct(id):
-    print(id)
-    toDelete = ProductsInfo.query.get_or_404(id)
-    try:
-        db.session.delete(toDelete)
-        db.session.commit()
-        return redirect('/admin')
-    except:
-        return "Some error occured while deleting the file"
+    if 'username' in session and session['username'] == 'admin':
+        print(id)
+        toDelete = ProductsInfo.query.get_or_404(id)
+        try:
+            db.session.delete(toDelete)
+            db.session.commit()
+            return redirect('/admin')
+        except:
+            return "Some error occured while deleting the file"
+    else:
+        return render_template('Error.html', title = "Access Denied!", msg = "You need admin priviledges to perform this action!")
 
 # -------------------------> For Homepage
 
@@ -152,9 +159,14 @@ def deleteProduct(id):
 @app.route('/')
 def home():
     allProducts = []
+
+    # Adding a username in session with value if doesn't exists any.
+    if 'username' not in session:
+        session['username'] = 'None'
+        session['logged_in'] = False
+
     try:
         allProducts = ProductsInfo.query.all()
-        print("======-=-=-=-==-=======>", allProducts)
     except:
         pass
     return render_template('home.html', allProducts=allProducts)
@@ -163,6 +175,12 @@ def home():
 # -----------------------------> For logging in admin and normal users
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    
+    # Adding a username in session with value if doesn't exists any.
+    if 'username' not in session:
+        session['username'] = 'None'
+        session['logged_in'] = False
+
     form = LoginForm()
     # For admin
     if form.username.data and form.username.data == 'admin':
@@ -183,7 +201,6 @@ def login():
                 if bcrypt.check_password_hash(username.password, form.password.data):
                     session['username'] = request.form['username']
                     session['logged_in'] = True
-                    login_user(username)
                     return redirect('/')
                 else:
                     flash(f'Your credentials did not match. Please try again', 'danger')
@@ -196,7 +213,7 @@ def login():
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
-    logout_user()
+    session['username'] = 'None'
     session['logged_in'] = False
     return redirect(url_for('login'))
 
@@ -222,12 +239,29 @@ def signup():
 
 @app.route('/order/<int:productid>')
 def order(productid):
-    try:
-        productDetails = ProductsInfo.query.get_or_404(productid)
-        return render_template('order.html', productDetails=productDetails)
-    except:
-        #!!! Product not found Warning must show up
-        return redirect('/')
+    if 'username' in session and session['username']!='None':
+        try:
+            productDetails = ProductsInfo.query.get_or_404(productid)
+            session['productid'] = productid
+            return render_template('order.html', productDetails=productDetails)
+        except:
+            #!!! Product not found Warning must show up
+            return redirect('/')
+    else:
+        flash(f'To buy, you need to be signed up!', 'danger')
+        return redirect('/login')
+
+def register_order():
+    if 'username' in session and session['username'] != 'None':
+        newOrder = ProductsInfo(
+            userid = User.query.filter_by(username=session['username']).first().id,
+            productid = session['productid']
+        )
+        try:
+            db.session.add(newOrder)
+            db.session.commit()
+        except:
+            return "There was an issue pushing to database"
 
 
 if __name__ == '__main__':
