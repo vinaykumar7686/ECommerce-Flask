@@ -2,9 +2,9 @@ import os
 from flask import Flask, url_for, redirect, request, flash, session
 from flask.templating import render_template
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import UserMixin, login_manager, login_user, login_required, LoginManager, current_user, logout_user
+from flask_login import UserMixin, login_manager, login_user, login_required, LoginManager, current_user, logout_user, mixins
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField, IntegerField
 from wtforms.validators import InputRequired, Length, ValidationError, EqualTo
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_bcrypt import Bcrypt
@@ -28,11 +28,14 @@ login_manager.login_view = "login"
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-
+# ----------------------------------------------------------------------------------
 # --------------------------------> Table to store products
-class ProductsInfo(db.Model):
+
+
+class ProductsInfo(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
+    author = db.Column(db.String(200), nullable=False)
     description = db.Column(db.String(200), nullable=False)
     price = db.Column(db.Integer)
     link = db.Column(db.String(200), nullable=False)
@@ -42,9 +45,8 @@ class ProductsInfo(db.Model):
     def __repr__(self):
         return f'<Task : {self.id}>'
 
+
 # -----------------------------> Table to store the details of all the products brought
-
-
 class ProductBrought(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     userid = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -53,6 +55,7 @@ class ProductBrought(db.Model):
     date = db.Column(db.DateTime, default=datetime.utcnow)
 
 
+# ---------------------------------------------------------------------------------
 # -----------------------> Table containing details of users
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -60,6 +63,8 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(20), nullable=False, unique=True)
     mobile = db.Column(db.String(20), nullable=False, unique=True)
+
+# -------------------------> User Form
 
 
 class RegsiterForm(FlaskForm):
@@ -108,13 +113,15 @@ def adminHome():
     # --------------> For admin to add new product
     if request.method == 'POST':
         newItem = ProductsInfo(
-        name=request.form['productName'],
-        description=request.form['productDescription'],
-        price=request.form['productPrice'],
-        link=request.form['productLink'],
-        thumbnailLink=request.form['thumbnailLink']
+            name=request.form['productName'],
+            author=request.form['productAuthor'],
+            description=request.form['productDescription'],
+            price=request.form['productPrice'],
+            link=request.form['productLink'],
+            thumbnailLink=request.form['thumbnailLink']
         )
         try:
+            session['productName'] = request.form['productName']
             db.session.add(newItem)
             db.session.commit()
             return redirect('/admin')
@@ -144,14 +151,19 @@ def deleteProduct(id):
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    allProducts = []
+    try:
+        allProducts = ProductsInfo.query.all()
+        print("======-=-=-=-==-=======>", allProducts)
+    except:
+        pass
+    return render_template('home.html', allProducts=allProducts)
 
 
 # -----------------------------> For logging in admin and normal users
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-
     # For admin
     if form.username.data and form.username.data == 'admin':
         if form.password.data == 'admin':
@@ -188,11 +200,6 @@ def logout():
     session['logged_in'] = False
     return redirect(url_for('login'))
 
-# @app.route('/dashboard', methods=['GET', 'POST'])
-# @login_required
-# def dashboard():
-#     return render_template('dashboard.html')
-
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -213,14 +220,14 @@ def signup():
     return render_template('register.html', form=form)
 
 
-@app.route('/order')
-def order():
-    return render_template('order.html')
-
-
-@app.route('/orderStatus')
-def orderStatus():
-    return render_template('orderPlaced.html')
+@app.route('/order/<int:productid>')
+def order(productid):
+    try:
+        productDetails = ProductsInfo.query.get_or_404(productid)
+        return render_template('order.html', productDetails=productDetails)
+    except:
+        #!!! Product not found Warning must show up
+        return redirect('/')
 
 
 if __name__ == '__main__':
