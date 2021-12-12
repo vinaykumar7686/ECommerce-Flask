@@ -226,7 +226,6 @@ def home():
 
     try:
         allProducts = ProductsInfo.query.all()
-        print("======-=-=-=-==-=======>", allProducts)
     except:
         pass
     return render_template('home.html', allProducts=allProducts)
@@ -323,18 +322,18 @@ def order(productid):
         return redirect('/login')
 
 
-def register_order():
-    if 'username' in session and session['username'] != 'None':
+# def register_order():
+#     if 'username' in session and session['username'] != 'None':
 
-        newOrder = ProductBrought(userid=User.query.filter_by(username=session['username']).first().id,
-                                  productid=session['productid'])
-        print(newOrder)
-        try:
-            db.session.add(newOrder)
-            db.session.commit()
-        except:
-            return "There was an issue pushing to database"
-    return render_template('order.html')
+#         newOrder = ProductBrought(userid=User.query.filter_by(username=session['username']).first().id,
+#                                   productid=session['productid'])
+#         print(newOrder)
+#         try:
+#             db.session.add(newOrder)
+#             db.session.commit()
+#         except:
+#             return "There was an issue pushing to database"
+#     return render_template('order.html')
 
 
 if __name__ == '__main__':
