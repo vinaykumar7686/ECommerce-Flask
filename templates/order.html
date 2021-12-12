@@ -8,16 +8,15 @@
   <div class="row">
     <div class="row">
       <div class="col-lg-6">
-        <div class="card mt-4">
-          <div id="itemImage"></div>
-          <img class="card-img-top img-fluid" src={{ productDetails.thumbnailLink }} alt="" style="
+        <div id="itemImage"></div>
+        <img  class="card-img-top img-fluid mt-4 ml-4" src="static/images/{{productDetails.imageName}}" alt="" style="
               width: 300px;
               height: 390px;
               margin-left: auto;
               margin-right: auto;
             " />
-        </div>
       </div>
+
       <div class="col-lg-6">
         <div class="card card-outline-secondary my-4">
           <div class="card-header">
@@ -30,8 +29,8 @@
             <p class="card-text">{{ productDetails.description }}</p>
             <h4 class="card-title">Price</h4>
             <p class="card-text"><strong>{{ productDetails.price }}</strong></p>
-            <a href="" download><button id='buy-button' onClick="myFunction()" type="button"
-                class="btn btn-primary">
+            <a download={{ productDetails.link }} id="download-now"><button type="submit" id='buy-button'
+                onClick="myFunction()" type="button" class="btn btn-primary">
                 Buy Now
               </button></a>
           </div>
@@ -43,12 +42,16 @@
 <script>
   var counter = 0;
   function myFunction() {
-    if (counter == 0){
+    if (counter == 0) {
       document.getElementById("buy-button").innerHTML = "Download Now";
-    document.getElementById("buy-button").className = "btn btn-success"; 
-    counter+=1
+      document.getElementById("buy-button").className = "btn btn-success";
+      counter += 1
     }
-       
+    else {
+      document.getElementById("download-now").setAttribute("href", "{{ productDetails.link }}");
+      document.getElementById("download-now").setAttribute("target", "_blank");
+      swal("Thanks for Buying!", "Visit again!", "success");
+    }
   }
 </script>
 {% endblock %}

@@ -103,7 +103,7 @@
 {% for product in allProducts %}
 
 <section class="resource">
-  <img src={{product.thumbnailLink}} alt="" class="resource_img">
+  <img src="static/images/{{product.imageName}}" alt="" class="resource_img">
   <h3 class="add_padding my-2">{{product.name}}</h3>
   <p class="add_padding">{{product.description}}</p>
   <h4>{{product.price}}</h4>
