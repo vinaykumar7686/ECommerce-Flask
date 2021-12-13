@@ -1,0 +1,58 @@
+{% extends "heading.html" %}
+{% block content %}
+<link rel="icon" property="icon" href="https://cdn-icons-png.flaticon.com/512/282/282100.png" type="image/x-icon" />
+<link rel="stylesheet" property="stylesheet"
+  href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" />
+<div class="container">
+  <h1 style="text-align:center;" class="my-2">{{ productDetails.name }}</h1>
+  <div class="row">
+    <div class="row">
+      <div class="col-lg-6">
+        <div id="itemImage"></div>
+        <img  class="card-img-top img-fluid mt-4 ml-4" src="/static/images/{{productDetails.imageName}}" alt="" style="
+              width: 300px;
+              height: 390px;
+              margin-left: auto;
+              margin-right: auto;
+              border-radius: 25px;
+            " />
+      </div>
+
+      <div class="col-lg-6">
+        <div class="card card-outline-secondary my-4">
+          <div class="card-header">
+            <h2>Book Details</h2>
+          </div>
+          <div class="card-body">
+            <h4 class="card-title">Author</h4>
+            <p class="card-text">{{ productDetails.author }}</p>
+            <h4 class="card-title">Description</h4>
+            <p class="card-text">{{ productDetails.description }}</p>
+            <h4 class="card-title">Price</h4>
+            <p class="card-text"><strong>{{ productDetails.price }}</strong></p>
+            <a download={{ productDetails.link }} id="download-now"><button type="submit" id='buy-button'
+                onClick="myFunction()" type="button" class="btn btn-primary">
+                Buy Now
+              </button></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  var counter = 0;
+  function myFunction() {
+    if (counter == 0) {
+      document.getElementById("buy-button").innerHTML = "Download Now";
+      document.getElementById("buy-button").className = "btn btn-success";
+      counter += 1
+    }
+    else {
+      document.getElementById("download-now").setAttribute("href", "{{ productDetails.link }}");
+      document.getElementById("download-now").setAttribute("target", "_blank");
+      swal("Thanks for Buying!", "Visit again!", "success");
+    }
+  }
+</script>
+{% endblock %}

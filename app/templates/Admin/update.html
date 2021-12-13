@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}
+<title>Update Product</title>
+{% endblock %}
+
+{% block body %}
+
+<div id="addItem"><br>
+    <h3 style="text-align:center;">Update the columns that you want to update</h3>
+    <div class="container">
+        <br>
+        <form action="{{url_for('UpdateProducts')}}" method="POST" enctype="multipart/form-data">
+            <input type="text" value="{{product_id}}" name="product_id" style="display: None;">
+            <div class="mb-3">
+                <label for="productName" class="form-label">Product Name: </label>
+                <input type="text" class="form-control" name="productName" id="productName" value="{{toUpdate.name}}" />
+            </div>
+
+            <div class="mb-3">
+                <label for="productAuthor" class="form-label">Product Author: </label>
+                <input type="text" class="form-control" name="productAuthor" id="productAuthor"
+                    value="{{toUpdate.author}}" />
+            </div>
+
+            <div class="mb-3">
+                <label for="productDescription" class="form-label">Product Description: </label>
+                <input type="text" class="form-control" name="productDescription" id="productDescription"
+                    value="{{toUpdate.description}}"/>
+            </div>
+            <div class="mb-3">
+                <label for="productPrice" class="form-label">Product Price: </label>
+                <input type="text" class="form-control" name="productPrice" id="productPrice"
+                    value="{{toUpdate.price}}" />
+            </div>
+            <div class="mb-3">
+                <label for="productLink" class="form-label">Product Download Link: </label>
+                <input type="text" class="form-control" name="productLink" id="productLink" value="{{toUpdate.link}}" />
+            </div>
+            <div class="mb-3">
+                <input type="file" class="form-control"  name="productImage" id="productImage" />
+            </div>
+            <div class="mb-3">
+                <input class="btn btn-primary" type="submit" value="Update in database" name="imageName">
+            </div>
+        </form>
+    </div>
+</div>
+
+</form>
+{% endblock %}

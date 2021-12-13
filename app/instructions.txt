@@ -1,0 +1,6 @@
+To install all the modules we have to run the requirements.txt file with the help of following command :-
+
+pip install -r requirements.txt
+
+Note :– While running the above command make sure that you are in the same directory
+where you requirements.txt file is present.
