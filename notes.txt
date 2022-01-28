@@ -1,4 +1,0 @@
-add successfully signedup
-after logging in redirect to homepage
-add error msg when login fails
-whne logged in , navbar menu change from login to logout
