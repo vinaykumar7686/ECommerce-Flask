@@ -3,7 +3,12 @@
 <title>{{title}}</title>
 {% endblock %}
 {% block body %}
-{{msg}}
-<br/>
-<a href="/login">Login Page</a>
+<br />
+<div class="container" style="text-align: center">
+    <h1>{{msg}}</h1>
+    <div class="my-2 mb-3">
+        <a href="{{ url_for('login')}}"><button class="btn btn-primary">Login Page</button></a>
+    </div>
+</div>
+
 {% endblock %}

@@ -6,16 +6,28 @@
 {% block content %}
 
 <div class="jumbotron jumbotron-fluid">
-    <div class="container">
+    <div class="container my-2">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div style="text-align:center;" class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{message}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
         <h1 style="text-align:center; margin:50px;" onclick="takeHome();" class="display-4">Hey! Admin</h1>
     </div>
 </div>
 <div class="container">
     <div style="text-align:center; " class="mb-4" id="buttons">
         <h3 style="margin:30px;">Select your action</h3>
-        <button type="button" style="margin:50px;" class="btn btn-primary btn-lg btn-block addButton" onclick="triggerAdd()">Add an
+        <button type="button" style="margin:50px; word-wrap: break-word;"
+            class="btn btn-primary btn-lg btn-block addButton" onclick="triggerAdd()">Add an
             Item</button>
-        <button type="button"  style="margin:50px;" class="btn btn-danger btn-lg btn-block removeButton" onclick="triggerRemove()">Remove/Update Item</button>
+        <button type="button" style="margin:50px; word-wrap: break-word;"
+            class="btn btn-danger btn-lg btn-block removeButton" onclick="triggerRemove()">Remove/Update Item</button>
     </div>
 </div>
 
@@ -23,31 +35,31 @@
     <h3 style="text-align:center;">Fill in the details and press "Add to Database":</h3><br />
     <div class="container">
         <form action="/admin" method="POST" enctype="multipart/form-data">
-        
+
             <div class="mb-3">
                 <label for="productName" class="form-label">Product Name: </label>
-            <input type="text" class="form-control" name="productName" id="productName" required/>
+                <input type="text" class="form-control" name="productName" id="productName" required />
             </div>
-    
+
             <div class="mb-3">
                 <label for="productAuthor" class="form-label">Product Author: </label>
-            <input type="text" class="form-control" name="productAuthor" id="productAuthor" required/>
+                <input type="text" class="form-control" name="productAuthor" id="productAuthor" required />
             </div>
             <div class="mb-3">
                 <label for="productDescription" class="form-label">Product Description: </label>
-                <input type="text" class="form-control" name="productDescription" id="productDescription" required/>
+                <input type="text" class="form-control" name="productDescription" id="productDescription" required />
             </div>
             <div class="mb-3">
                 <label for="productPrice" class="form-label">Product Price: </label>
-                <input type="text" class="form-control" name="productPrice" id="productPrice" required/>
+                <input type="text" class="form-control" name="productPrice" id="productPrice" required />
             </div>
             <div class="mb-3">
                 <label for="productLink" class="form-label">Product Download Link: </label>
-                <input type="text" class="form-control" name="productLink" id="productLink" required/>
+                <input type="text" class="form-control" name="productLink" id="productLink" required />
             </div>
             <div class="mb-3">
                 <label for="productImage" class="form-label">Product Thumbnail: </label>
-                <input type="file" class="form-control" name="productImage" id="productImage" required/><br /><br />
+                <input type="file" class="form-control" name="productImage" id="productImage" required /><br /><br />
             </div>
             <div class="mb-3">
                 <input class="btn btn-primary" type="submit" value="Add to database" name="imageName" />
@@ -60,26 +72,29 @@
     <div class="table-responsive">
         <div class="table-wrapper">
             <div id="deleteItem">
-                <table class="table table-striped table-hover table-bordered">
+                <table class="table table-striped table-hover table-bordered" style="table-layout:fixed; width:100%;">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Price</th>
-                            <th>Download Link</th>
-                            <th>Actions</th>
+                            <th style="width:20%">Name</th>
+                            <th style="width:30%">Description</th>
+                            <th style="width:20%">Price</th>
+                            <th style="width:20%">Download Link</th>
+                            <th style="width:20%">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for product in products %}
                         <tr>
-                            <td>{{product.name}}</td>
-                            <td>{{product.description}}</td>
-                            <td>{{product.price}}</td>
-                            <td>{{product.link}}</td>
-                            <td><a href="/update/{{product.id}}">Update</a><br />
-                                <a href="/delete/{{product.id}}">Delete</a>
-                            </td>
+                            <td style="width:20%; word-wrap:break-word;">{{product.name}}</td>
+                            <td style="width:30%; word-wrap:break-word;">{{product.description}}</td>
+                            <td style="width:20%; word-wrap:break-word;">{{product.price}}</td>
+                            <td style="width:20%; word-wrap:break-word;">{{product.link}}</td>
+                            <div class="container" style="text-align:center; " class="mb-4" id="buttons">
+                                <td style="width:20%; word-wrap:break-word;">
+                                    <a href="/update/{{product.id}}"><button class="btn btn-success">Update</button></a>
+                                    <a href="/delete/{{product.id}}"><button class="btn btn-danger">Delete</button></a>
+                                </td>
+                            </div>
                         </tr>
                         {%endfor%}
                     </tbody>

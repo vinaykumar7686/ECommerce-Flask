@@ -37,6 +37,8 @@ def load_user(user_id):
 # ----------------------------------------------------------------------------------
 
 # --------------------------------> Table to store products
+
+
 class ProductsInfo(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False)
@@ -58,7 +60,6 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(20), nullable=False, unique=True)
     mobile = db.Column(db.String(20), nullable=False, unique=True)
-
 
 
 # -------------------------> User Registration Form
@@ -130,6 +131,7 @@ def adminHome():
                 session['productName'] = request.form['productName']
                 db.session.add(newItem)
                 db.session.commit()
+                flash(f'Product added successfully', 'success')
                 return redirect('/admin')
             except:
                 return "There was an issue pushing to database"
@@ -139,8 +141,7 @@ def adminHome():
             products = ProductsInfo.query.order_by(ProductsInfo.name).all()
             return render_template('Admin/adminPanel.html', products=products)
     else:
-        return render_template('Error.html', title='Access Denied', msg="Unable to access admin Homepage, Please signin to continue.")
-
+        return render_template('Error.html', title='Access Denied', msg="Unable to access admin Homepage. Please signin to continue.")
 
 
 # -----------------------> For admin to delete a product
@@ -152,6 +153,7 @@ def deleteProduct(id):
         try:
             db.session.delete(toDelete)
             db.session.commit()
+            flash(f'Product deleted', 'danger')
             return redirect('/admin')
         except:
             return "Some error occured while deleting the file"
@@ -170,7 +172,6 @@ def updateProduct(id):
             return render_template('Admin/update.html', toUpdate=toUpdate, product_id=id)
         else:
             return render_template('Error.html', title="Access Denied!", msg="You need admin priviledges to perform this action!")
-
 
 
 # --------------------------> For admin to update the product details
@@ -192,13 +193,17 @@ def UpdateProducts():
             db.session.query(ProductsInfo).filter(ProductsInfo.id == request.form['product_id']).update(
                 {'name': name, 'author': author, 'description': description, 'price': price, 'link': link, 'imageName': image})
             db.session.commit()
+            flash(f'Product updated successfully', 'success')
 
         else:
             db.session.query(ProductsInfo).filter(ProductsInfo.id == request.form['product_id']).update(
                 {'name': name, 'author': author, 'description': description, 'price': price, 'link': link})
             db.session.commit()
+            flash(f'Product updated successfully', 'success')
+
         return redirect('/admin')
     else:
+
         return render_template('Error.html', title="Access Denied!", msg="You need admin priviledges to perform this action!")
 
 
@@ -266,6 +271,8 @@ def logout():
     return redirect(url_for('login'))
 
 # -----------------------------------> For signing up a user
+
+
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     form = RegsiterForm()
@@ -308,6 +315,10 @@ def order(productid):
     else:
         flash(f'To buy, you need to be signed up!', 'danger')
         return redirect('/login')
+
+
+def getApp():
+    return app
 
 
 if __name__ == '__main__':
